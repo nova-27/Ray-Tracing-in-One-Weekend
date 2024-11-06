@@ -102,6 +102,10 @@ impl Vec3 {
     pub fn unit_vector(self) -> Self {
         self / self.length()
     }
+
+    pub fn dot(&self, rhs: &Self) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
 }
 
 impl Add<Vec3> for Vec3 {
