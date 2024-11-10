@@ -1,4 +1,8 @@
-use ray_tracing_in_one_weekend::{Color, Point3, Ray, Vec3};
+use core::f64;
+
+use ray_tracing_in_one_weekend::{
+    Color, HitRecord, Hittable, HittableList, Point3, Ray, Sphere, Vec3,
+};
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -38,6 +42,24 @@ fn main() {
             z: FOCAL_LENGTH,
         };
 
+    let mut world = HittableList::new();
+    world.add(Box::new(Sphere {
+        center: Point3 {
+            x: 0.,
+            y: 0.,
+            z: -1.,
+        },
+        radius: 0.5,
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3 {
+            x: 0.,
+            y: -100.5,
+            z: -1.,
+        },
+        radius: 100.,
+    }));
+
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scanlines remaining: {}", j);
         for i in 0..IMAGE_WIDTH {
@@ -49,7 +71,7 @@ fn main() {
                 direction: lower_left_corner - ORIGIN + u * HORIZONTAL + v * VERTICAL,
             };
 
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &world);
             pixel_color.write_color();
         }
     }
@@ -57,22 +79,30 @@ fn main() {
     eprintln!("Done.")
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(
-        &Point3 {
+fn ray_color(ray: &Ray, world: &impl Hittable) -> Color {
+    let mut rec = HitRecord {
+        p: Point3 {
             x: 0.,
             y: 0.,
-            z: -1.,
+            z: 0.,
         },
-        0.5,
-        ray,
-    ) {
-        return Color {
-            r: 1.,
-            g: 0.,
-            b: 0.,
-        };
+        normal: Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        },
+        t: 0.,
+        front_face: false,
+    };
+    if world.hit(ray, 0., f64::MAX, &mut rec) {
+        return 0.5
+            * Color {
+                r: rec.normal.x + 1.,
+                g: rec.normal.y + 1.,
+                b: rec.normal.z + 1.,
+            };
     }
+
     let unit_direction = ray.direction.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
     (1.0 - t)
@@ -86,12 +116,4 @@ fn ray_color(ray: &Ray) -> Color {
             g: 0.7,
             b: 1.0,
         }
-}
-
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
-    let oc = ray.origin - *center;
-    let a = Vec3::dot(&ray.direction, &ray.direction);
-    let half_b = Vec3::dot(&oc, &ray.direction);
-    let c = Vec3::dot(&oc, &oc) - radius * radius;
-    half_b * half_b - a * c > 0.
 }
