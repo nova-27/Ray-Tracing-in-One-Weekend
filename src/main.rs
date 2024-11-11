@@ -1,7 +1,7 @@
 use core::f64;
 
 use ray_tracing_in_one_weekend::{
-    Color, HitRecord, Hittable, HittableList, Point3, Ray, Sphere, Vec3,
+    data3d::Color, data3d::Point3, data3d::Vec3, HitRecord, Hittable, HittableList, Ray, Sphere,
 };
 
 fn main() {
