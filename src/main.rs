@@ -1,7 +1,7 @@
 use core::f64;
 
 use ray_tracing_in_one_weekend::{
-    data3d::Color, data3d::Point3, data3d::Vec3, HitRecord, Hittable, HittableList, Ray, Sphere,
+    data3d::Color, data3d::Point3, data3d::Vec3, Hittable, HittableList, Ray, Sphere,
 };
 
 fn main() {
@@ -25,14 +25,8 @@ fn main() {
         ORIGIN - HORIZONTAL / 2.0 - VERTICAL / 2.0 - Vec3::new(0.0, 0.0, FOCAL_LENGTH);
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, -100.5, -1.0),
-        radius: 100.0,
-    }));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scanlines remaining: {}", j);
@@ -40,10 +34,10 @@ fn main() {
             let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
             let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
 
-            let ray = Ray {
-                origin: ORIGIN,
-                direction: lower_left_corner - ORIGIN + u * HORIZONTAL + v * VERTICAL,
-            };
+            let ray = Ray::new(
+                ORIGIN,
+                lower_left_corner - ORIGIN + u * HORIZONTAL + v * VERTICAL,
+            );
 
             let pixel_color = ray_color(&ray, &world);
             pixel_color.write_color();
@@ -54,22 +48,16 @@ fn main() {
 }
 
 fn ray_color(ray: &Ray, world: &impl Hittable) -> Color {
-    let mut rec = HitRecord {
-        p: Point3::new(0.0, 0.0, 0.0),
-        normal: Vec3::new(0.0, 0.0, 0.0),
-        t: 0.0,
-        front_face: false,
-    };
-    if world.hit(ray, 0.0, f64::MAX, &mut rec) {
+    if let Some(rec) = world.hit(ray, 0.0, f64::MAX) {
         return 0.5
             * Color::new(
-                rec.normal.get_x() + 1.0,
-                rec.normal.get_y() + 1.,
-                rec.normal.get_z() + 1.,
+                rec.get_normal().get_x() + 1.0,
+                rec.get_normal().get_y() + 1.,
+                rec.get_normal().get_z() + 1.,
             );
     }
 
-    let unit_direction = ray.direction.unit_vector();
+    let unit_direction = ray.get_direction().unit_vector();
     let t = 0.5 * (unit_direction.get_y() + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
