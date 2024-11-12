@@ -1,5 +1,6 @@
 use data3d::{Point3, Vec3};
 
+pub mod camera;
 pub mod data3d;
 
 #[derive(Clone, Copy, Debug)]

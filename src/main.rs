@@ -1,7 +1,9 @@
 use core::f64;
 
 use ray_tracing_in_one_weekend::{
-    data3d::Color, data3d::Point3, data3d::Vec3, Hittable, HittableList, Ray, Sphere,
+    camera::Camera,
+    data3d::{Color, Point3},
+    Hittable, HittableList, Ray, Sphere,
 };
 
 fn main() {
@@ -13,16 +15,7 @@ fn main() {
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
-    const VIEWPORT_HEIGHT: f64 = 2.0;
-    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-    const FOCAL_LENGTH: f64 = 1.0;
-
-    const ORIGIN: Point3 = Point3::new(0.0, 0.0, 0.0);
-    const HORIZONTAL: Vec3 = Vec3::new(VIEWPORT_WIDTH, 0.0, 0.0);
-    const VERTICAL: Vec3 = Vec3::new(0.0, VIEWPORT_HEIGHT, 0.0);
-
-    let lower_left_corner: Point3 =
-        ORIGIN - HORIZONTAL / 2.0 - VERTICAL / 2.0 - Vec3::new(0.0, 0.0, FOCAL_LENGTH);
+    let camera = Camera::new(ASPECT_RATIO);
 
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
@@ -34,10 +27,7 @@ fn main() {
             let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
             let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
 
-            let ray = Ray::new(
-                ORIGIN,
-                lower_left_corner - ORIGIN + u * HORIZONTAL + v * VERTICAL,
-            );
+            let ray = camera.get_ray(u, v);
 
             let pixel_color = ray_color(&ray, &world);
             pixel_color.write_color();
