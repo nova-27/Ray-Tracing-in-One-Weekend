@@ -40,6 +40,10 @@ impl HitRecord {
         }
     }
 
+    pub fn get_p(&self) -> Point3 {
+        self.p
+    }
+
     pub fn get_normal(&self) -> Vec3 {
         self.normal
     }

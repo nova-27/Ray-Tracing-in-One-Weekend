@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
+use rand::Rng;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
     r: f64,
@@ -13,9 +15,9 @@ impl Color {
     }
 
     pub fn write_color(&self, samples_per_pixel: i32) {
-        let r = self.r / samples_per_pixel as f64;
-        let g = self.g / samples_per_pixel as f64;
-        let b = self.b / samples_per_pixel as f64;
+        let r = (self.r / samples_per_pixel as f64).sqrt();
+        let g = (self.g / samples_per_pixel as f64).sqrt();
+        let b = (self.b / samples_per_pixel as f64).sqrt();
 
         let r = (255.999 * r) as i32;
         let g = (255.999 * g) as i32;
@@ -165,6 +167,15 @@ impl Vec3 {
 
     pub fn dot(&self, rhs: &Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub fn random_unit_sphere() -> Self {
+        let mut rng = rand::thread_rng();
+        let a = rng.gen_range(0.0..2.0 * std::f64::consts::PI);
+        let z = rng.gen_range(-1.0..1.0);
+        let r = (1.0 as f64 - z * z).sqrt();
+
+        Vec3::new(r * a.cos(), r * a.sin(), z)
     }
 }
 

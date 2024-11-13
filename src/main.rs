@@ -3,7 +3,7 @@ use core::f64;
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
     camera::Camera,
-    data3d::{Color, Point3},
+    data3d::{Color, Point3, Vec3},
     Hittable, HittableList, Ray, Sphere,
 };
 
@@ -12,6 +12,7 @@ fn main() {
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: u32 = 50;
 
     println!("P3");
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -35,7 +36,7 @@ fn main() {
                 let v = (j as f64 + rng.gen::<f64>()) / ((IMAGE_HEIGHT - 1) as f64);
 
                 let ray = camera.get_ray(u, v);
-                pixel_color += ray_color(&ray, &world);
+                pixel_color += ray_color(&ray, &world, MAX_DEPTH);
             }
 
             pixel_color.write_color(SAMPLES_PER_PIXEL);
@@ -45,14 +46,14 @@ fn main() {
     eprintln!("Done.")
 }
 
-fn ray_color(ray: &Ray, world: &impl Hittable) -> Color {
-    if let Some(rec) = world.hit(ray, 0.0, f64::MAX) {
-        return 0.5
-            * Color::new(
-                rec.get_normal().get_x() + 1.0,
-                rec.get_normal().get_y() + 1.0,
-                rec.get_normal().get_z() + 1.0,
-            );
+fn ray_color(ray: &Ray, world: &impl Hittable, depth: u32) -> Color {
+    if depth == 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
+    if let Some(rec) = world.hit(ray, 0.001, f64::MAX) {
+        let new_ray_dir = rec.get_normal() + Vec3::random_unit_sphere();
+        return 0.5 * ray_color(&Ray::new(rec.get_p(), new_ray_dir), world, depth - 1);
     }
 
     let unit_direction = ray.get_direction().unit_vector();
