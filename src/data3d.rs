@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
@@ -12,10 +12,14 @@ impl Color {
         Self { r, g, b }
     }
 
-    pub fn write_color(&self) {
-        let r = (255.999 * self.r) as i32;
-        let g = (255.999 * self.g) as i32;
-        let b = (255.999 * self.b) as i32;
+    pub fn write_color(&self, samples_per_pixel: i32) {
+        let r = self.r / samples_per_pixel as f64;
+        let g = self.g / samples_per_pixel as f64;
+        let b = self.b / samples_per_pixel as f64;
+
+        let r = (255.999 * r) as i32;
+        let g = (255.999 * g) as i32;
+        let b = (255.999 * b) as i32;
         println!("{} {} {}", r, g, b);
     }
 }
@@ -29,6 +33,12 @@ impl Add for Color {
             g: self.g + rhs.g,
             b: self.b + rhs.b,
         }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
     }
 }
 

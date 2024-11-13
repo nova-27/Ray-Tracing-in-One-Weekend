@@ -1,5 +1,6 @@
 use core::f64;
 
+use rand::Rng;
 use ray_tracing_in_one_weekend::{
     camera::Camera,
     data3d::{Color, Point3},
@@ -10,6 +11,7 @@ fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 100;
 
     println!("P3");
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -21,16 +23,22 @@ fn main() {
     world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
+    let mut rng = rand::thread_rng();
+
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scanlines remaining: {}", j);
         for i in 0..IMAGE_WIDTH {
-            let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
 
-            let ray = camera.get_ray(u, v);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rng.gen::<f64>()) / ((IMAGE_WIDTH - 1) as f64);
+                let v = (j as f64 + rng.gen::<f64>()) / ((IMAGE_HEIGHT - 1) as f64);
 
-            let pixel_color = ray_color(&ray, &world);
-            pixel_color.write_color();
+                let ray = camera.get_ray(u, v);
+                pixel_color += ray_color(&ray, &world);
+            }
+
+            pixel_color.write_color(SAMPLES_PER_PIXEL);
         }
     }
 
@@ -42,8 +50,8 @@ fn ray_color(ray: &Ray, world: &impl Hittable) -> Color {
         return 0.5
             * Color::new(
                 rec.get_normal().get_x() + 1.0,
-                rec.get_normal().get_y() + 1.,
-                rec.get_normal().get_z() + 1.,
+                rec.get_normal().get_y() + 1.0,
+                rec.get_normal().get_z() + 1.0,
             );
     }
 
