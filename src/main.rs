@@ -4,7 +4,8 @@ use rand::Rng;
 use ray_tracing_in_one_weekend::{
     camera::Camera,
     data3d::{Color, Point3, Vec3},
-    Hittable, HittableList, Ray, Sphere,
+    hittable::{sphere::Sphere, Hittable, HittableList},
+    Ray,
 };
 
 fn main() {
