@@ -6,7 +6,7 @@ use ray_tracing_in_one_weekend::{
     camera::Camera,
     data3d::{Color, Point3, Reflectance},
     hittable::{sphere::Sphere, Hittable, HittableList},
-    material::lambertian::Lambertian,
+    material::{lambertian::Lambertian, metal::Metal},
     Ray,
 };
 
@@ -33,6 +33,16 @@ fn main() {
         Point3::new(0.0, -100.5, -1.0),
         100.0,
         Rc::new(Lambertian::new(Reflectance::new(0.8, 0.8, 0.0))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Metal::new(Reflectance::new(0.8, 0.6, 0.2))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Metal::new(Reflectance::new(0.8, 0.8, 0.8))),
     )));
 
     let mut rng = rand::thread_rng();
