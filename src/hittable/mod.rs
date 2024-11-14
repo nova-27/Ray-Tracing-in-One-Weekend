@@ -39,6 +39,10 @@ impl HitRecord {
         Rc::clone(&self.material)
     }
 
+    pub fn is_front_face(&self) -> bool {
+        self.front_face
+    }
+
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         self.front_face = Vec3::dot(&ray.direction, &outward_normal) < 0.;
         self.normal = if self.front_face {

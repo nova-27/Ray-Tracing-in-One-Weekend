@@ -1,5 +1,6 @@
 use crate::{data3d::Attenuation, hittable::HitRecord, Ray};
 
+pub mod dielectric;
 pub mod lambertian;
 pub mod metal;
 
