@@ -81,19 +81,19 @@ impl Div<f64> for Color {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct Reflectance {
+pub struct Attenuation {
     r: f64,
     g: f64,
     b: f64,
 }
 
-impl Reflectance {
+impl Attenuation {
     pub const fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
 }
 
-impl Mul<Color> for Reflectance {
+impl Mul<Color> for Attenuation {
     type Output = Color;
 
     fn mul(self, rhs: Color) -> Self::Output {

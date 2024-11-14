@@ -1,5 +1,5 @@
 use crate::{
-    data3d::{Reflectance, Vec3},
+    data3d::{Attenuation, Vec3},
     hittable::HitRecord,
     Ray,
 };
@@ -7,12 +7,12 @@ use crate::{
 use super::Material;
 
 pub struct Metal {
-    albedo: Reflectance,
+    albedo: Attenuation,
     fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Reflectance, fuzz: f64) -> Self {
+    pub fn new(albedo: Attenuation, fuzz: f64) -> Self {
         Self { albedo, fuzz }
     }
 
@@ -22,7 +22,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray_in: &Ray, rec: &HitRecord) -> Option<(Ray, Reflectance)> {
+    fn scatter(&self, ray_in: &Ray, rec: &HitRecord) -> Option<(Ray, Attenuation)> {
         let reflected = Metal::reflect(ray_in.direction.unit_vector(), rec.get_normal());
         let scattered = Ray::new(
             rec.get_p(),

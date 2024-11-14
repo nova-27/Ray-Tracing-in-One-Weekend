@@ -4,7 +4,7 @@ use std::rc::Rc;
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
     camera::Camera,
-    data3d::{Color, Point3, Reflectance},
+    data3d::{Attenuation, Color, Point3},
     hittable::{sphere::Sphere, Hittable, HittableList},
     material::{lambertian::Lambertian, metal::Metal},
     Ray,
@@ -27,22 +27,22 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, 0.0, -1.0),
         0.5,
-        Rc::new(Lambertian::new(Reflectance::new(0.7, 0.3, 0.3))),
+        Rc::new(Lambertian::new(Attenuation::new(0.7, 0.3, 0.3))),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),
         100.0,
-        Rc::new(Lambertian::new(Reflectance::new(0.8, 0.8, 0.0))),
+        Rc::new(Lambertian::new(Attenuation::new(0.8, 0.8, 0.0))),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Reflectance::new(0.8, 0.6, 0.2), 0.3)),
+        Rc::new(Metal::new(Attenuation::new(0.8, 0.6, 0.2), 0.3)),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Reflectance::new(0.8, 0.8, 0.8), 1.0)),
+        Rc::new(Metal::new(Attenuation::new(0.8, 0.8, 0.8), 1.0)),
     )));
 
     let mut rng = rand::thread_rng();
@@ -74,7 +74,7 @@ fn ray_color(ray: &Ray, world: &impl Hittable, depth: u32) -> Color {
 
     if let Some(rec) = world.hit(ray, 0.001, f64::MAX) {
         return match rec.get_material().scatter(ray, &rec) {
-            Some((scattered, reflectance)) => reflectance * ray_color(&scattered, world, depth - 1),
+            Some((scattered, attenuation)) => attenuation * ray_color(&scattered, world, depth - 1),
             None => Color::new(0.0, 0.0, 0.0),
         };
     }
