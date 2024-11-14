@@ -37,12 +37,12 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Reflectance::new(0.8, 0.6, 0.2))),
+        Rc::new(Metal::new(Reflectance::new(0.8, 0.6, 0.2), 0.3)),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Reflectance::new(0.8, 0.8, 0.8))),
+        Rc::new(Metal::new(Reflectance::new(0.8, 0.8, 0.8), 1.0)),
     )));
 
     let mut rng = rand::thread_rng();

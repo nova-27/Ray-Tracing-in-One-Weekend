@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
-use rand::Rng;
+use rand::{distributions::Uniform, Rng};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
@@ -201,6 +201,18 @@ impl Vec3 {
         let r = (1.0 as f64 - z * z).sqrt();
 
         Vec3::new(r * a.cos(), r * a.sin(), z)
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        let range = Uniform::new(-1.0, 1.0);
+        let mut rng = rand::thread_rng();
+
+        loop {
+            let p = Vec3::new(rng.sample(range), rng.sample(range), rng.sample(range));
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
     }
 }
 
