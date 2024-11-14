@@ -81,6 +81,31 @@ impl Div<f64> for Color {
 }
 
 #[derive(Clone, Copy, Debug)]
+pub struct Reflectance {
+    r: f64,
+    g: f64,
+    b: f64,
+}
+
+impl Reflectance {
+    pub const fn new(r: f64, g: f64, b: f64) -> Self {
+        Self { r, g, b }
+    }
+}
+
+impl Mul<Color> for Reflectance {
+    type Output = Color;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
 pub struct Point3 {
     x: f64,
     y: f64,

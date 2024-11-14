@@ -3,6 +3,7 @@ use data3d::{Point3, Vec3};
 pub mod camera;
 pub mod data3d;
 pub mod hittable;
+pub mod material;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Ray {

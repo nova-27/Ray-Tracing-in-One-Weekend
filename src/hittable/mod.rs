@@ -1,5 +1,8 @@
+use std::rc::Rc;
+
 use crate::{
     data3d::{Point3, Vec3},
+    material::Material,
     Ray,
 };
 
@@ -10,15 +13,17 @@ pub struct HitRecord {
     normal: Vec3,
     t: f64,
     front_face: bool,
+    material: Rc<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(p: Point3, t: f64) -> Self {
+    pub fn new(p: Point3, t: f64, material: Rc<dyn Material>) -> Self {
         Self {
             p,
             normal: Vec3::new(0.0, 0.0, 0.0),
             t,
             front_face: false,
+            material,
         }
     }
 
@@ -28,6 +33,10 @@ impl HitRecord {
 
     pub fn get_normal(&self) -> Vec3 {
         self.normal
+    }
+
+    pub fn get_material(&self) -> Rc<dyn Material> {
+        Rc::clone(&self.material)
     }
 
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {

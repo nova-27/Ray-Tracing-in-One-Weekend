@@ -1,5 +1,8 @@
+use std::rc::Rc;
+
 use crate::{
     data3d::{Point3, Vec3},
+    material::Material,
     Ray,
 };
 
@@ -8,11 +11,16 @@ use super::{HitRecord, Hittable};
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius }
+    pub fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -32,7 +40,7 @@ impl Hittable for Sphere {
                 let p = ray.at(t);
                 let outward_normal = (p - self.center) / self.radius;
 
-                let mut rec = HitRecord::new(p, t);
+                let mut rec = HitRecord::new(p, t, Rc::clone(&self.material));
                 rec.set_face_normal(ray, outward_normal);
                 return Some(rec);
             }
@@ -43,7 +51,7 @@ impl Hittable for Sphere {
                 let p = ray.at(t);
                 let outward_normal = (p - self.center) / self.radius;
 
-                let mut rec = HitRecord::new(p, t);
+                let mut rec = HitRecord::new(p, t, Rc::clone(&self.material));
                 rec.set_face_normal(ray, outward_normal);
                 return Some(rec);
             }

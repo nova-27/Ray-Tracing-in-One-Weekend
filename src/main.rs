@@ -1,10 +1,12 @@
 use core::f64;
+use std::rc::Rc;
 
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
     camera::Camera,
-    data3d::{Color, Point3, Vec3},
+    data3d::{Color, Point3, Reflectance},
     hittable::{sphere::Sphere, Hittable, HittableList},
+    material::lambertian::Lambertian,
     Ray,
 };
 
@@ -22,8 +24,16 @@ fn main() {
     let camera = Camera::new(ASPECT_RATIO);
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Lambertian::new(Reflectance::new(0.7, 0.3, 0.3))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        Rc::new(Lambertian::new(Reflectance::new(0.8, 0.8, 0.0))),
+    )));
 
     let mut rng = rand::thread_rng();
 
@@ -53,8 +63,10 @@ fn ray_color(ray: &Ray, world: &impl Hittable, depth: u32) -> Color {
     }
 
     if let Some(rec) = world.hit(ray, 0.001, f64::MAX) {
-        let new_ray_dir = rec.get_normal() + Vec3::random_unit_sphere();
-        return 0.5 * ray_color(&Ray::new(rec.get_p(), new_ray_dir), world, depth - 1);
+        return match rec.get_material().scatter(ray, &rec) {
+            Some((scattered, reflectance)) => reflectance * ray_color(&scattered, world, depth - 1),
+            None => Color::new(0.0, 0.0, 0.0),
+        };
     }
 
     let unit_direction = ray.get_direction().unit_vector();
