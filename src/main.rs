@@ -37,11 +37,16 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Attenuation::new(0.8, 0.6, 0.2), 0.0)),
+        Rc::new(Metal::new(Attenuation::new(0.8, 0.6, 0.2), 0.3)),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
+        Rc::new(Dielectric::new(1.5)),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.45,
         Rc::new(Dielectric::new(1.5)),
     )));
 

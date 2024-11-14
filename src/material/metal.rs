@@ -16,7 +16,7 @@ impl Metal {
         Self { albedo, fuzz }
     }
 
-    fn reflect(in_dir: Vec3, normal: Vec3) -> Vec3 {
+    pub fn reflect(in_dir: Vec3, normal: Vec3) -> Vec3 {
         in_dir - 2.0 * in_dir.dot(&normal) * normal
     }
 }
